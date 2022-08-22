@@ -197,7 +197,42 @@ void GetDeviceInfo()
 {
   char buf[32];
   uint8_t ret;
+  SPS30_version v;
 
+  //try to read serial number
+  ret = sps30.GetSerialNumber(buf, 32);
+  if (ret == SPS30_ERR_OK) {
+    Serial.print(F("Serial number : "));
+    if(strlen(buf) > 0)  Serial.println(buf);
+    else Serial.println(F("not available"));
+  }
+  else
+    ErrtoMess((char *) "could not get serial number. ", ret);
+
+  // try to get product name
+  ret = sps30.GetProductName(buf, 32);
+  if (ret == SPS30_ERR_OK)  {
+    Serial.print(F("Product name  : "));
+
+    if(strlen(buf) > 0)  Serial.println(buf);
+    else Serial.println(F("not available"));
+  }
+  else
+    ErrtoMess((char *) "could not get product name. ", ret);
+
+  // try to get version info
+  ret = sps30.GetVersion(&v);
+  if (ret != SPS30_ERR_OK) {
+    Serial.println(F("Can not read version info."));
+    return;
+  }
+
+  Serial.print(F("Firmware level: "));   Serial.print(v.major);
+  Serial.print(".");  Serial.println(v.minor);
+
+  Serial.print(F("Library level : "));  Serial.print(v.DRV_major);
+  Serial.print(".");  Serial.println(v.DRV_minor);
+}
 
 /**
  * @brief : read and display all values

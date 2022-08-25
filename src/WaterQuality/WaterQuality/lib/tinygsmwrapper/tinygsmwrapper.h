@@ -1,23 +1,13 @@
 #ifndef TINYGSMWRAPPER_H
-#define TINYGSMWRAPPER_H
-
+  #define TINYGSMWRAPPER_H
   #include <Arduino.h>
   #include <HardwareSerial.h>
-  // src: https://github.com/Xinyuan-LilyGO/LilyGO-T-SIM7000G
-  // https://github.com/vshymanskyy/TinyGSM/blob/master/examples/HttpClient/HttpClient.ino
-
-  #define TINY_GSM_MODEM_SIM7000
-  // tinygsm
-  #define TINY_GSM_USE_GPRS true
-  #define TINY_GSM_USE_WIFI false
-
   #include <TinyGSM.h>
   #include <ArduinoHttpClient.h>
   #include <StreamDebugger.h>
 
   #define SerialMon Serial
   #define SerialAT Serial1
-  #define TinyGSMDEBUG
   #ifndef TinyGSMDEBUG
       TinyGsm modem(SerialAT);
       TinyGsmClient client(modem);
@@ -26,7 +16,6 @@
       TinyGsm modem(debugger);
       TinyGsmClient client(modem);
   #endif
-  #define TINY_GSM_RX_BUFFER 650
 
   class TinyGSMWrapper{
     public:

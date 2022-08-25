@@ -4,10 +4,6 @@
 #ifndef SURFSIDESCIENCE_H
     #define SURFSIDESCIENCE_H
 
-
-    int SUCCESS = 1;
-    int ERROR = -1;
-
     class surfSideScience{
         public:
         /**
@@ -15,6 +11,18 @@
          * 
          */
         String deviceName="NO_ID";
+
+        /**
+         * @brief SUCCESS
+         * 
+         */
+        int SUCCESS = 1;
+
+        /**
+         * @brief ERROR
+         * 
+         */
+        int ERROR = -1;
 
         /**
          * @brief error strings {err, }

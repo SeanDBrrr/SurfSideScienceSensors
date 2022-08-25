@@ -2,23 +2,27 @@
 #include <Arduino.h>
 #include <surfsidescience.h>
 
-#define TINY_GSM_MODEM_SIM7000
-#define TinyGSMDEBUG
-#define TINY_GSM_USE_GPRS true
-#define TINY_GSM_USE_WIFI false
-#define TINY_GSM_RX_BUFFER 650
-#include <tinygsmwrapper.h>
-
-
-#include <sdlogger.h>
+//sensors libraries include
 #include <ezo_rtd_i2c.h>
 #include <voltagesensor.h>
 #include <ezo_do_i2c.h>
 #include <ezo_ec_i2c.h>
 #include <ezo_ph_i2c.h>
+
+// communication 
+#include <tinygsmwrapper.h>
+
+// sdlogger
+#include <sdlogger.h>
+
+// ESP specific 
 #include <esp_task_wdt.h>
 
-//t=7:49pm  vbat: 4.21 //8am vBat=4.15  approx blife==20*12hrs=10days
+
+
+
+
+
 int numberOfSensors = 2;
 int pinNumber[] = {36, 35};
 String sensorname[] = {"SOLAR_VIN", "BATTERY_VIN"};

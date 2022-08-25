@@ -2,7 +2,10 @@
     #define VOLTAGESENSOR_H
     #include <sensorbase.h>
     #include <Arduino.h>
-
+    /**
+     * @brief xxx
+     * 
+     */
     class voltageSensor: public sensorBase{
         public:
         int sensorPin[BASE_SENSORS_DEFAULT_NR_READINGS];

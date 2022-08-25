@@ -25,31 +25,41 @@
         int ERROR = -1;
 
         /**
-         * @brief error strings {err, }
-         * 
+         * @brief payload = {
+         *                  'deviceName':'id',
+         *                  'timestamp':'ISO 8601',
+         *                  'sensors': [
+         *                              {sensor data}
+         *                              ]
+         *                   }
          */
-
-        /**
-         * @brief {error},...,{errorN}
-         * 
-         */
-        String errorBuffer="";
+        String payload="";
 
         /**
          * @brief payload = {
          *                  'deviceName':'id',
          *                  'timestamp':'ISO 8601',
-         *                  'sensors': {sensor data}
-         *                   }     * 
+         *                  'errors': [
+         *                              {error}
+         *                            ]
+         *                   }
+         * 
          */
-        String payload="";
+        String errorPayload="";
+
+        /**
+         * @brief devices errors in json "{"sensorName": "String" ,"error": "string"},...,{dataN}"
+         * 
+         */
+        String errorBuffer="";
+
         /**
          * @brief flag for posted data
          * 
          */
         bool payloadPosted = false;
         /**
-         * @brief sensor data in json "{'sensorName':'','value': val,'unit': unt},...,{dataN}"
+         * @brief sensor data in json "{"sensorName": "String" ,"value": val,"unit": "string"},...,{dataN}"
          * 
          */
         String sensorsData="";
@@ -69,7 +79,7 @@
          */
         long sensorStabilizeDelay=0;
         /**
-         * @brief 
+         * @brief process sensors passed to this functions 
          * 
          * @tparam T object type
          * @param sensors objects
@@ -216,13 +226,32 @@
             payload.replace("'", String('"'));
         }
 
+        /**
+         * @brief generate error payload
+         * 
+         * @param dateTime 
+         */
+        void generateErrorPayload(String dateTime){
+            errorPayload = "{";
+            errorPayload += "'deviceName':'"+String(deviceName)+"',";
+            errorPayload += "'timestamp':'"+dateTime+"',";
+            errorPayload += "'errors':[";
+            errorPayload += errorBuffer;
+            errorPayload += "]}";
+            errorPayload.replace("'", String('"'));
+        }
+
         template <typename loggerType>
         int log(loggerType logger){
             Serial.println("logger status: "+String(logger.status));
             if(logger.status == -1){return -1;}
             if(!payloadPosted){logger.writeTemp(payload);}
             logger.writeData(payload);
-            if(errorBuffer.length() > 0){logger.writeLog(errorBuffer);}
+            if(errorBuffer.length() > 0)
+            {
+                generateErrorPayload();
+                logger.writeLog(errorPayload);
+            }
             return 1;
         }
     };

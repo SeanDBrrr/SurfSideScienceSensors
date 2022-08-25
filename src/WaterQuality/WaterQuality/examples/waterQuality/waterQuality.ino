@@ -1,28 +1,25 @@
 #include <Wire.h>
 #include <Arduino.h>
+
+//surfside science sequencer object
 #include <surfsidescience.h>
+surfSideScience myscience("WATER_QUALITY_01");
 
-//sensors libraries include
-#include <ezo_rtd_i2c.h>
-#include <voltagesensor.h>
-#include <ezo_do_i2c.h>
-#include <ezo_ec_i2c.h>
-#include <ezo_ph_i2c.h>
-
-// communication 
+//tinyGSMwrapper objcet for communication
+#define TINY_GSM_MODEM_SIM7000 // define  TinyGsmClient model
+#define TinyGSMDEBUG
+#define TINY_GSM_USE_GPRS true
+#define TINY_GSM_USE_WIFI false
+#define TINY_GSM_RX_BUFFER 650
 #include <tinygsmwrapper.h>
+TinyGSMWrapper mysim;
 
-// sdlogger
+// SDlogger for sd data log
 #include <sdlogger.h>
+sdlogger mylogger;
 
-// ESP specific 
-#include <esp_task_wdt.h>
-
-
-
-
-
-
+//voltage sensor object for solar pannel and battery voltage
+#include <voltagesensor.h>
 int numberOfSensors = 2;
 int pinNumber[] = {36, 35};
 String sensorname[] = {"SOLAR_VIN", "BATTERY_VIN"};
@@ -33,52 +30,65 @@ String unit[] = {"mV", "mV"};
 int numberOfSamples=10;
 long sampleRead_delay=50;
 int decimals=3;
-
-surfSideScience myscience("WATER_QUALITY_01");
-TinyGSMWrapper mysim;
-sdlogger mylogger;
-ezo_rtd_i2c myRTD;
-ezo_ec_i2c myEC;
-ezo_ph_i2c myPH;
-ezo_do_i2c myDO;
 voltageSensor voltageSensors(numberOfSensors,pinNumber,sensorname,voltageSenseFactor,min_,max_,unit,numberOfSamples,sampleRead_delay, decimals);
 
+//ESO_RTD sensor
+#include <ezo_rtd_i2c.h>
+ezo_rtd_i2c myRTD;
 
+//EZO_EC sensor
+#include <ezo_ec_i2c.h>
+ezo_ec_i2c myEC;
+
+//EZO_PH sensor
+#include <ezo_ph_i2c.h>
+ezo_ph_i2c myPH;
+
+//EZO_DO sensor
+#include <ezo_do_i2c.h>
+ezo_do_i2c myDO;
+
+
+
+//MCU specific functions please change these if ESP32 is not used
+#include <esp_task_wdt.h>
 void go_to_sleep(){
-  Serial.println("Sleeping for: 3600 seconds");
   ESP.deepSleep(1000000*60*60);
 }
+void enableWDT(){
+    esp_task_wdt_init(60*10, true); //enable panic so ESP32 restarts
+    esp_task_wdt_add(NULL); //add current thread to WDT watch
+}
+
+void disableWDT(){
+    esp_task_wdt_deinit();
+}
+
 void setup() {
-  // pinMode(32, OUTPUT);
-  // digitalWrite(32, HIGH);
-  
-  uint32_t timer1, timer2, timer3;
-  Wire.begin();
-  Serial.begin(115200);
+    // enable serial communication
+    Wire.begin();
+    Serial.begin(115200);
 
-  esp_task_wdt_init(60*10, true); //enable panic so ESP32 restarts
-  esp_task_wdt_add(NULL); //add current thread to WDT watch
-  Serial.println("WDT enabled timeoute: "+String(60*10)+" s");
+    // enable watchdog timer
+    enableWDT();
 
+    // call begin methods
+    mysim.begin();
+    mylogger.begin();
 
-  mysim.begin();
-  mylogger.begin();
-  timer2 = millis();
-  myscience.processSensors(voltageSensors, myEC,myDO,myPH, myRTD);
-  timer2 = millis() - timer2;
-  timer3 = millis();
-  myscience.postData(mysim);
-  myscience.log(mylogger);
-  timer3 = millis() - timer3;
+    //pass the sensor, communication and logger objects to the sequencer
+    myscience.processSensors(voltageSensors, myEC,myDO,myPH, myRTD);
+    myscience.postData(mysim);
+    myscience.log(mylogger);
 
-  Serial.println("going to sleep");
-  mylogger.writeToSD("timer1: "+String(timer1)+" timer2: "+String(timer2)+" timer3: "+String(timer3), "timerOn.txt");
-  esp_task_wdt_deinit();
-  go_to_sleep();
+    // disable watchdog timer
+    disableWDT();
+
+    // go to sleep
+    go_to_sleep();
 }
 
 
 void loop() {
-  // put your main code here, to run repeatedly:
 
 }

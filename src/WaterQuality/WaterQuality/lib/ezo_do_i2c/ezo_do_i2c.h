@@ -72,6 +72,12 @@
             return status_;
         }
 
+        /**
+         * @brief disable sensor implementation
+         * 
+         * @param sensorstatus 
+         * @return int 
+         */
         int disableSensorsImpl(int *sensorstatus){
             digitalWrite(ENABLEPIN, !SENSOR_ENABLE_STATE);
             delay(sensorPwrDelay);
@@ -81,6 +87,12 @@
             return sensorstatus[0];
         }
 
+        /**
+         * @brief calibrate sensor implementation
+         * 
+         * @param sensorstatus 
+         * @return int 
+         */
         int calibrateSensorsImpl(int statusLed,int *sensorstatus){
             sensorstatus[0] = SENSOR_BASE_SUCCESS;
             return SENSOR_BASE_SUCCESS;

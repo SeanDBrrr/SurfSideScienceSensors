@@ -56,7 +56,6 @@ void setup() {
   esp_task_wdt_add(NULL); //add current thread to WDT watch
   Serial.println("WDT enabled timeoute: "+String(60*10)+" s");
 
-
   mysim.begin();
   mylogger.begin();
   timer2 = millis();

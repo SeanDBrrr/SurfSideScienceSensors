@@ -206,6 +206,7 @@
                     payloadPosted = true;
                 }
             }
+            generateErrorPayload(Modem.dateTime);
             Modem.disableModem();
             return 0;
         }
@@ -249,7 +250,6 @@
             logger.writeData(payload);
             if(errorBuffer.length() > 0)
             {
-                generateErrorPayload();
                 logger.writeLog(errorPayload);
             }
             return 1;

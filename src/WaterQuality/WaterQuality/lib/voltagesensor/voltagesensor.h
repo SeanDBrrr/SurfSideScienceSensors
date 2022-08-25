@@ -3,14 +3,28 @@
     #include <sensorbase.h>
     #include <Arduino.h>
     /**
-     * @brief xxx
-     * 
+     * @brief Voltage sensor class.
+     * subclass of sensorBase class.
      */
     class voltageSensor: public sensorBase{
         public:
         int sensorPin[BASE_SENSORS_DEFAULT_NR_READINGS];
         int senseFactor[BASE_SENSORS_DEFAULT_NR_READINGS];
 
+        /**
+         * @brief Construct a new voltage Sensor object
+         * 
+         * @param numberOfSensors Input number of sensors
+         * @param pinNumber Input pin number
+         * @param sensorname Input sensor name
+         * @param voltageSenseFactor Input voltage sense factor
+         * @param min_ Input min threshold for measurement 
+         * @param max_ Input max threshold for measurement 
+         * @param unit Input unit type
+         * @param numberOfSamples Input samples per reading
+         * @param sampleRead_delay Inpout sample read delay
+         * @param decimals Input measurement decimals ammount
+         */
         voltageSensor(int numberOfSensors, int pinNumber[], String sensorname[], float voltageSenseFactor[], float min_[], float max_[], String unit[], int numberOfSamples=10, long sampleRead_delay=50, int decimals=3){
                 ENABLEPIN=0;
                 averagingSamples=numberOfSamples;

@@ -18,8 +18,19 @@ class PMS_SS : public sensorBase
 public:
     PMS *pms;
     PMS::DATA pms_data;
-    int index_;
-    void begin(int rxPin, int txPin, int enablepin, String sensorname[], String unit[], int numberOfSamples = 10, long sampleRead_delay = 50, int decimals = 0, int index = 0)
+    /**
+     * @brief Begin function for PMS sensor class. All class attributes needed for this class will be defined.
+     * 
+     * @param rxPin Input RX pin
+     * @param txPin Input TX pin
+     * @param enablepin Input enable pin
+     * @param sensorname Setup sensor name
+     * @param unit Input units
+     * @param numberOfSamples Input number of samples per reading
+     * @param sampleRead_delay Input sample read delay
+     * @param decimals Input measurement decimals ammount
+     */
+    void begin(int rxPin, int txPin, int enablepin, String sensorname[], String unit[], int numberOfSamples = 10, long sampleRead_delay = 50, int decimals = 0)
     {
         ENABLEPIN = enablepin;
         averagingSamples = numberOfSamples;
@@ -28,7 +39,6 @@ public:
         SENSOR_ENABLE_STATE = HIGH;
         sensorPwrDelay = 500;
         numberOfreadings = 3;
-        index_ = index;
         serial.begin(9600, SWSERIAL_8N1, rxPin, txPin, false, 192);
         PMS pms_(serial);
            pms = &pms_;
@@ -49,6 +59,14 @@ public:
         }
     }
 
+    /**
+     * @brief Setting up iplementation for sensor readings.
+     * 
+     * @param buffer Array of sensor measurements.
+     * @param sensorstatus Sensor status code.
+     * @param delay_ Delay.
+     * @return Int Status code.
+     */
     int readSensorImpl(float *buffer, int *sensorstatus, long delay_)
     {
         pms->requestRead();
@@ -71,6 +89,12 @@ public:
         }
     }
 
+    /**
+     * @brief Setting up iplementation for enabling the sensor.
+     * 
+     * @param sensorstatus Sensor status.
+     * @return int Status.
+     */
     int enableSensorsImpl(int *sensorstatus)
     {
         digitalWrite(ENABLEPIN, SENSOR_ENABLE_STATE);
@@ -84,6 +108,13 @@ public:
         }
         return status_;
     }
+
+    /**
+     * @brief Setting up iplementation for disabling the sensor.
+     * 
+     * @param sensorstatus Sensor status.
+     * @return int Status.
+     */
     int disableSensorsImpl(int *sensorstatus)
     {
         digitalWrite(ENABLEPIN, !SENSOR_ENABLE_STATE);
@@ -96,6 +127,13 @@ public:
         return status_;
     }
 
+    /**
+     * @brief Setting up iplementation for calibrating the sensor.
+     * 
+     * @param statusLed Imput status LED pin.
+     * @param sensorstatus Sensor status.
+     * @return int status.
+     */
     int calibrateSensorsImpl(int statusLed, int *sensorstatus)
     {
         for (int i = 0; i < numberOfreadings; i++)

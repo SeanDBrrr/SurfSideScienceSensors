@@ -12,6 +12,19 @@ surfSideScience myscience("WATER_QUALITY_01");
 #define TINY_GSM_USE_WIFI false
 #define TINY_GSM_RX_BUFFER 650
 #include <tinygsmwrapper.h>
+const char* apn="web.digicelaruba.com";
+const char* gprsuser="";
+const char* gprspass="";
+const char* server="surfside-db.brenchies.com";
+const char* postPath="/observations";
+const char* contentType= "application/json";
+String devicename="SIMCom SIM7000";
+long successCode=201;
+long uart_baud=115200;
+long pin_dtr=25;
+long pin_tx = 27;
+long pin_rx=26;
+long pin_pwr=4;
 TinyGSMWrapper mysim;
 
 // SDlogger for sd data log
@@ -48,12 +61,10 @@ ezo_ph_i2c myPH;
 #include <ezo_do_i2c.h>
 ezo_do_i2c myDO;
 
-
-
 //MCU specific functions please change these if ESP32 is not used
 #include <esp_task_wdt.h>
-void go_to_sleep(){
-  ESP.deepSleep(1000000*60*60);
+void go_to_sleep(int minutes=60){
+  ESP.deepSleep(1000000*60*minutes);
 }
 void enableWDT(){
     esp_task_wdt_init(60*10, true); //enable panic so ESP32 restarts
@@ -73,7 +84,7 @@ void setup() {
     enableWDT();
 
     // call begin methods
-    mysim.begin();
+    mysim.begin(apn, gprsuser, gprspass, server, postPath, successCode, contentType, uart_baud, pin_dtr, pin_tx, pin_rx, pin_pwr, devicename);
     mylogger.begin();
 
     //pass the sensor, communication and logger objects to the sequencer

@@ -17,6 +17,10 @@
       TinyGsmClient client(modem);
   #endif
 
+  /**
+   * @brief wrapper for the TinyGSM class
+   * 
+   */
   class TinyGSMWrapper{
     public:
     String errorBuffer = "";

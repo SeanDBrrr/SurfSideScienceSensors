@@ -9,7 +9,6 @@
 #include "PMS_SSS.h"
 #include "SPS30_SS.h"
 #include "esp_task_wdt.h"
-//t=7:49pm  vbat: 4.21 //8am vBat=4.15  approx blife==20*12hrs=10days
 
 surfSideScience myscience("AIR_QUALITY_01");
 TinyGSMWrapper mysim;
@@ -18,7 +17,7 @@ sdlogger mylogger;
 int numberOfSensors = 2;
 int pinNumber[] = {36, 35};
 String sensorname[] = {"SOLAR_VIN", "BATTERY_VIN"};
-float voltageSenseFactor[] = {1,1};
+float voltageSenseFactor[] = {4200/2395.600, 4200/2395.600};
 float max_[] = {6000, 5000};
 float min_[] = {0,0};
 String unit[] = {"mV", "mV"};
@@ -51,7 +50,6 @@ ESP.deepSleep(1000000*60*60);
 }
 void setup() {
   // put your setup code here, to run once:
-  //unsigned long loop_time = millis();
   Wire.begin();
   Serial.begin(115200);
 
@@ -71,8 +69,6 @@ void setup() {
 
   Serial.println("going to sleep");
   esp_task_wdt_deinit();
-  //loop_time = millis();
-  //Serial.println(loop_time);
   go_to_sleep();
 }
 
@@ -80,6 +76,3 @@ void loop() {
 
   delay(2000);
 }
-//  voltage:   4,09
-//  Time:     9:22 pm
-//  Date:     12 august 2022

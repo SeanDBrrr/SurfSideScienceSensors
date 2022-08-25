@@ -4,6 +4,10 @@
 #include <Arduino.h>
 #include "SHT31.h"
 
+/**
+ * @brief SHT31 class
+ * Inherits from sensorBase class and SHT31 class.
+ */
 class SHT31_S : public sensorBase, public SHT31
 {
 public:
@@ -13,6 +17,16 @@ public:
         HUMIDITY
     };
 
+    /**
+     * @brief Construct a new sht31 s object.
+     * 
+     * @param enablepin Input enable pin.
+     * @param sensorname Input sensor name.
+     * @param unit Input sensor units.
+     * @param numberOfSamples Input number of samples per reading.
+     * @param sampleRead_delay Inout read elay per sample
+     * @param decimals Input measurement decimals ammount.
+     */
     SHT31_S(int enablepin, String sensorname[], String unit[], int numberOfSamples = 10, long sampleRead_delay = 50, int decimals = 2):SHT31()
     {
         ENABLEPIN = enablepin;
@@ -40,6 +54,14 @@ public:
         }
     }
 
+    /**
+     * @brief Setting up iplementation for sensor readings.
+     *
+     * @param buffer Array of sensor measurements.
+     * @param sensorstatus Sensor status code.
+     * @param delay_ Delay.
+     * @return Int Status code.
+     */
     int readSensorImpl(float *buffer, int *sensorstatus, long delay_)
     {
         if (isConnected())
@@ -59,6 +81,12 @@ public:
         }
     }
 
+    /**
+     * @brief Setting up iplementation for enabling the sensor.
+     *
+     * @param sensorstatus Sensor status.
+     * @return int Status.
+     */
     int enableSensorsImpl(int *sensorstatus)
     {
         digitalWrite(ENABLEPIN, SENSOR_ENABLE_STATE);
@@ -71,6 +99,12 @@ public:
         return status_;
     }
     
+    /**
+     * @brief Setting up iplementation for disabling the sensor.
+     *
+     * @param sensorstatus Sensor status.
+     * @return int Status.
+     */
     int disableSensorsImpl(int *sensorstatus)
     {
         digitalWrite(ENABLEPIN, !SENSOR_ENABLE_STATE);
@@ -83,6 +117,13 @@ public:
         return status_;
     }
 
+    /**
+     * @brief Setting up iplementation for calibrating the sensor.
+     *
+     * @param statusLed Imput status LED pin.
+     * @param sensorstatus Sensor status.
+     * @return int status.
+     */
     int calibrateSensorsImpl(int statusLed, int *sensorstatus)
     {
         for (int i = 0; i < numberOfreadings; i++)

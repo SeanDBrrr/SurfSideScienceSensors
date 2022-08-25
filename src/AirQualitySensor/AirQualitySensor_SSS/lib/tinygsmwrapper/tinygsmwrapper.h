@@ -210,6 +210,7 @@ class TinyGSMWrapper{
         Serial.println(SerialAT.readString());
         Serial.println(modem.getGSMDateTime(format));
         modem.getNetworkTime(&year, &month, &day, &hour, &minute, &second, &timezone);
+        timezone = 4;
         String timezoneStr = String(timezone);
         timezoneStr.replace(".", ":");
         String datetime = String(year)+"-"+\

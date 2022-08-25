@@ -9,7 +9,7 @@
 #include "SHT31_S.h"
 #include "PMS_SS.h"
 #include "PMS_SSS.h"
-#include "SPS30_SS.h"
+//#include "SPS30_SS.h"
 
 // Communication
 #include <tinygsmwrapper.h>
@@ -29,19 +29,19 @@ TinyGSMWrapper mysim; // tinyGSMwrapper objcet for communication
 #include <sdlogger.h>
 sdlogger mylogger;
 
+int enablepin = 12; // Enable pin
 // Voltage sensor attributes for solar panel and battery voltage
 int numberOfSensors = 2;
 int pinNumber[] = {36, 35};
 String sensorname[] = {"SOLAR_VIN", "BATTERY_VIN"};
 float voltageSenseFactor[] = {4200/2395.600, 4200/2395.600};
 float max_[] = {6000, 5000};
-float min_[] = {0, 0};
+float min_[] = {0,0};
 String unit[] = {"mV", "mV"};
-int numberOfSamples = 10;
-long sampleRead_delay = 50;
-int decimals = 3;
+int numberOfSamples=10;
+long sampleRead_delay=50;
+int decimals=3;
 
-int enablepin = 12; // Enable pin
 
 // SHT31 sensor imput parameter attributes
 String sensornameSht[] = {"Temperature", "Humidity"};
@@ -49,13 +49,13 @@ String unitSht[] = {"°C", "%"};
 int numberOfSamplesSht = 10;
 long sampleRead_delaySht = 50;
 
+//PMS5003 sensor imput parameter attributes
 String sensornamePM1[] = {"PM 1.0(PMS 1)", "PM 2.5(PMS 1)", "PM 10.0(PMS 1)"};
 String unitPM[] = {"μg/m3", "μg/m3", "μg/m3"};
 
 String sensornamePM2[] = {"PM 1.0(PMS 2)", "PM 2.5(PMS 2)", "PM 10.0(PMS 2)"};
 
 String sensornameSps30[] = {"PM 1.0(SPS 1)", "PM 2.5(SPS 1)", "PM 10.0(SPS 1)"};
-;
 
 // Creating sensor objects
 voltageSensor voltageSensors(numberOfSensors, pinNumber, sensorname, voltageSenseFactor, min_, max_, unit, numberOfSamples, sampleRead_delay, decimals);
@@ -101,7 +101,7 @@ void setup()
   // sps30.begin(&Wire);
 
   // Pass the sensor, communication and logger objects to the sequencer
-  myscience.processSensors(sht31, pms1, pms2); // must go at last
+  myscience.processSensors( sht31, pms1, pms2, voltageSensors); // must go at last
   myscience.postData(mysim);
   myscience.log(mylogger);
 

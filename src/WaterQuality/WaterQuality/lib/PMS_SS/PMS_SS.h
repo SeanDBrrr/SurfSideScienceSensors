@@ -13,6 +13,11 @@ enum Particulates
     PM10_0
 };
 
+/**
+ * @brief PMS class.
+ * Inherits from sensorBase class
+ * 
+ */
 class PMS_SS : public sensorBase
 {
 public:
@@ -20,7 +25,7 @@ public:
     PMS::DATA pms_data;
     /**
      * @brief Begin function for PMS sensor class. All class attributes needed for this class will be defined.
-     * 
+     *
      * @param rxPin Input RX pin
      * @param txPin Input TX pin
      * @param enablepin Input enable pin
@@ -41,7 +46,7 @@ public:
         numberOfreadings = 3;
         serial.begin(9600, SWSERIAL_8N1, rxPin, txPin, false, 192);
         PMS pms_(serial);
-           pms = &pms_;
+        pms = &pms_;
         for (int i = 0; i < numberOfreadings; i++)
         {
             sensorName[i] = sensorname[i];
@@ -61,7 +66,7 @@ public:
 
     /**
      * @brief Setting up iplementation for sensor readings.
-     * 
+     *
      * @param buffer Array of sensor measurements.
      * @param sensorstatus Sensor status code.
      * @param delay_ Delay.
@@ -91,7 +96,7 @@ public:
 
     /**
      * @brief Setting up iplementation for enabling the sensor.
-     * 
+     *
      * @param sensorstatus Sensor status.
      * @return int Status.
      */
@@ -111,7 +116,7 @@ public:
 
     /**
      * @brief Setting up iplementation for disabling the sensor.
-     * 
+     *
      * @param sensorstatus Sensor status.
      * @return int Status.
      */
@@ -129,7 +134,7 @@ public:
 
     /**
      * @brief Setting up iplementation for calibrating the sensor.
-     * 
+     *
      * @param statusLed Imput status LED pin.
      * @param sensorstatus Sensor status.
      * @return int status.

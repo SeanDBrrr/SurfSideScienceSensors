@@ -1,17 +1,28 @@
 #include <Wire.h>
 #include <Arduino.h>
+
+//SurfSide Science sequencer object
 #include <surfsidescience.h>
-#include <tinygsmwrapper.h>
-#include <sdlogger.h>
+
+
+//Sensors libraries include
 #include <voltagesensor.h>
 #include "SHT31_S.h"
 #include "PMS_SS.h"
 #include "PMS_SSS.h"
 #include "SPS30_SS.h"
-#include "esp_task_wdt.h"
-//t=7:49pm  vbat: 4.21 //8am vBat=4.15  approx blife==20*12hrs=10days
 
-surfSideScience myscience("AIR_QUALITY_01");
+//Communication 
+#include <tinygsmwrapper.h>
+
+//SDlogger
+#include <sdlogger.h>
+
+//ESP specific 
+#include "esp_task_wdt.h"
+
+
+surfSideScience myscience("AIR_QUALITY_01"); // 
 TinyGSMWrapper mysim;
 sdlogger mylogger;
 
@@ -40,6 +51,7 @@ String sensornamePM2[] = {"PM 1.0(PMS 2)", "PM 2.5(PMS 2)", "PM 10.0(PMS 2)"};
 
 String sensornameSps30[] = {"PM 1.0(SPS 1)", "PM 2.5(SPS 1)", "PM 10.0(SPS 1)"}; ; 
 
+//Creating sensor objects
 voltageSensor voltageSensors(numberOfSensors,pinNumber,sensorname,voltageSenseFactor,min_,max_,unit,numberOfSamples,sampleRead_delay, decimals);
 SHT31_S sht31(enablepin,sensornameSht,unitSht,numberOfSamplesSht, sampleRead_delaySht,decimals);
 SPS30_SS sps30(enablepin, sensornameSps30, unitPM);
@@ -51,7 +63,6 @@ ESP.deepSleep(1000000*60*60);
 }
 void setup() {
   // put your setup code here, to run once:
-  //unsigned long loop_time = millis();
   Wire.begin();
   Serial.begin(115200);
 
@@ -71,8 +82,6 @@ void setup() {
 
   Serial.println("going to sleep");
   esp_task_wdt_deinit();
-  //loop_time = millis();
-  //Serial.println(loop_time);
   go_to_sleep();
 }
 
@@ -80,6 +89,3 @@ void loop() {
 
   delay(2000);
 }
-//  voltage:   4,09
-//  Time:     9:22 pm
-//  Date:     12 august 2022

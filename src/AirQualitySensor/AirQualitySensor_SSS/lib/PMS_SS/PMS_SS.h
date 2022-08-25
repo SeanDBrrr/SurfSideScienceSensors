@@ -6,7 +6,7 @@
 #include "SoftwareSerial.h"
 SoftwareSerial serial;
 
-enum 
+enum Particulates
 {
     PM1_0,
     PM2_5,

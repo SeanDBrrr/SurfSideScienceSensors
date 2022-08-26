@@ -2,23 +2,30 @@
 #include <Arduino.h>
 #include <surfsidescience.h>
 
-#define TINY_GSM_MODEM_SIM7000
+#define TINY_GSM_MODEM_SIM7000      // define  TinyGsmClient model
 #define TinyGSMDEBUG
 #define TINY_GSM_USE_GPRS true
 #define TINY_GSM_USE_WIFI false
 #define TINY_GSM_RX_BUFFER 650
-#include <tinygsmwrapper.h>
 
-
+//Include libraries 
 #include <sdlogger.h>
-#include <ezo_rtd_i2c.h>
+#include <tinygsmwrapper.h>
 #include <voltagesensor.h>
-#include <ezo_do_i2c.h>
-#include <ezo_ec_i2c.h>
-#include <ezo_ph_i2c.h>
-#include <esp_task_wdt.h>
+#include "esp_task_wdt.h"
+#include "SHT31_S.h"
+#include "PMS_SS.h"
+#include "PMS_SSS.h"
+//#include "SPS30_SS.h"
 
-//t=7:49pm  vbat: 4.21 //8am vBat=4.15  approx blife==20*12hrs=10days
+surfSideScience myscience("AIR_QUALITY_01"); // Change module name here if you are re creating anothe module ex: "AIR_QUALITY_02"
+TinyGSMWrapper mysim; // tinyGSMwrapper objcet for communication
+sdlogger mylogger;// SDlogger for logging data in SD card
+
+
+int enablepin = 12; // Enable pin
+
+// Voltage sensor attributes for solar panel and battery voltage
 int numberOfSensors = 2;
 int pinNumber[] = {36, 35};
 String sensorname[] = {"SOLAR_VIN", "BATTERY_VIN"};
@@ -30,50 +37,72 @@ int numberOfSamples=10;
 long sampleRead_delay=50;
 int decimals=3;
 
-surfSideScience myscience("WATER_QUALITY_01");
-TinyGSMWrapper mysim;
-sdlogger mylogger;
-ezo_rtd_i2c myRTD;
-ezo_ec_i2c myEC;
-ezo_ph_i2c myPH;
-ezo_do_i2c myDO;
-voltageSensor voltageSensors(numberOfSensors,pinNumber,sensorname,voltageSenseFactor,min_,max_,unit,numberOfSamples,sampleRead_delay, decimals);
+// SHT31 sensor imput parameter attributes
+String sensornameSht[] = {"Temperature", "Humidity"};
+String unitSht[] = {"°C", "%"};
+int numberOfSamplesSht = 10;
+long sampleRead_delaySht = 50;
 
+//PMS5003 sensor imput parameter attributes
+String sensornamePM1[] = {"PM 1.0(PMS 1)", "PM 2.5(PMS 1)", "PM 10.0(PMS 1)"};
+String unitPM[] = {"μg/m3", "μg/m3", "μg/m3"};
+String sensornamePM2[] = {"PM 1.0(PMS 2)", "PM 2.5(PMS 2)", "PM 10.0(PMS 2)"};
+String sensornameSps30[] = {"PM 1.0(SPS 1)", "PM 2.5(SPS 1)", "PM 10.0(SPS 1)"};
 
-void go_to_sleep(){
-  Serial.println("Sleeping for: 3600 seconds");
-  ESP.deepSleep(1000000*60*60);
+// Creating sensor objects
+voltageSensor voltageSensors(numberOfSensors, pinNumber, sensorname, voltageSenseFactor, min_, max_, unit, numberOfSamples, sampleRead_delay, decimals);
+SHT31_S sht31(enablepin, sensornameSht, unitSht, numberOfSamplesSht, sampleRead_delaySht, decimals);
+PMS_SS pms1;
+PMS_SSS pms2;
+//SPS30_SS sps30(enablepin, sensornameSps30, unitPM); //(Not implemented yet)
+
+// Enable sleepmode cycle
+void go_to_sleep(int minutes = 60) // Default time set to 60 minutes.
+{
+  ESP.deepSleep(1000000 * 60 * minutes);
 }
-void setup() {
-  // pinMode(32, OUTPUT);
-  // digitalWrite(32, HIGH);
-  
-  uint32_t timer1, timer2, timer3;
+
+// Enable panic so ESP32 restarts
+void enableWDT(int minutes = 10)
+{
+  esp_task_wdt_init(60 * minutes, true);
+  esp_task_wdt_add(NULL); // Add current thread to WDT watch.
+}
+
+void disableWDT()
+{
+  esp_task_wdt_deinit();
+}
+
+void setup()
+{
+  // Enable UART and I2C communication.
   Wire.begin();
   Serial.begin(115200);
 
-  esp_task_wdt_init(60*10, true); //enable panic so ESP32 restarts
-  esp_task_wdt_add(NULL); //add current thread to WDT watch
-  Serial.println("WDT enabled timeoute: "+String(60*10)+" s");
+  // Call enable watchdog timer
+  enableWDT();
 
+  // Call begin methods
   mysim.begin();
   mylogger.begin();
-  timer2 = millis();
-  myscience.processSensors(voltageSensors, myEC,myDO,myPH, myRTD);
-  timer2 = millis() - timer2;
-  timer3 = millis();
+  sht31.begin();
+  pms1.begin(33, 32, enablepin, sensornamePM1, unitPM, numberOfSamples, sampleRead_delay);
+  pms2.begin(35, 34, enablepin, sensornamePM2, unitPM, numberOfSamples, sampleRead_delay);
+  // sps30.begin(&Wire);
+
+  // Pass the sensor, communication and logger objects to the sequencer
+  myscience.processSensors( sht31, pms1, pms2, voltageSensors); // must go at last
   myscience.postData(mysim);
   myscience.log(mylogger);
-  timer3 = millis() - timer3;
 
-  Serial.println("going to sleep");
-  mylogger.writeToSD("timer1: "+String(timer1)+" timer2: "+String(timer2)+" timer3: "+String(timer3), "timerOn.txt");
-  esp_task_wdt_deinit();
+  // Disable watchdog timer
+  disableWDT();
+
+  // Go to sleep
   go_to_sleep();
 }
 
-
-void loop() {
-  // put your main code here, to run repeatedly:
-
+void loop()
+{
 }

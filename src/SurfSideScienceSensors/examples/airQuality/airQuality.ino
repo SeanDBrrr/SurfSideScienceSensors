@@ -16,7 +16,7 @@
 #include "SHT31_S.h"
 #include "PMS_SS.h"
 #include "PMS_SSS.h"
-//#include "SPS30_SS.h" (Open for future implementation)
+//#include "SPS30_SS.h"
 
 surfSideScience myscience("AIR_QUALITY_01"); // Change module name here if you are re creating anothe module ex: "AIR_QUALITY_02"
 TinyGSMWrapper mysim; // tinyGSMwrapper objcet for communication
@@ -54,11 +54,25 @@ voltageSensor voltageSensors(numberOfSensors, pinNumber, sensorname, voltageSens
 SHT31_S sht31(enablepin, sensornameSht, unitSht, numberOfSamplesSht, sampleRead_delaySht, decimals);
 PMS_SS pms1;
 PMS_SSS pms2;
-//SPS30_SS sps30(enablepin, sensornameSps30, unitPM); //(Open for future implementation)
+//SPS30_SS sps30(enablepin, sensornameSps30, unitPM); //(Not implemented yet)
 
-void go_to_sleep(int minutes);
-void enableWDT(int minutes);
-void disableWDT();
+// Enable sleepmode cycle
+void go_to_sleep(int minutes = 60) // Default time set to 60 minutes.
+{
+  ESP.deepSleep(1000000 * 60 * minutes);
+}
+
+// Enable panic so ESP32 restarts
+void enableWDT(int minutes = 10)
+{
+  esp_task_wdt_init(60 * minutes, true);
+  esp_task_wdt_add(NULL); // Add current thread to WDT watch.
+}
+
+void disableWDT()
+{
+  esp_task_wdt_deinit();
+}
 
 void setup()
 {
@@ -67,7 +81,7 @@ void setup()
   Serial.begin(115200);
 
   // Call enable watchdog timer
-  enableWDT(10);
+  enableWDT();
 
   // Call begin methods
   mysim.begin();
@@ -75,7 +89,7 @@ void setup()
   sht31.begin();
   pms1.begin(33, 32, enablepin, sensornamePM1, unitPM, numberOfSamples, sampleRead_delay);
   pms2.begin(35, 34, enablepin, sensornamePM2, unitPM, numberOfSamples, sampleRead_delay);
-  // sps30.begin(&Wire); (Open for future implementation)
+  // sps30.begin(&Wire);
 
   // Pass the sensor, communication and logger objects to the sequencer
   myscience.processSensors( sht31, pms1, pms2, voltageSensors); // must go at last
@@ -86,39 +100,9 @@ void setup()
   disableWDT();
 
   // Go to sleep
-  go_to_sleep(60);
+  go_to_sleep();
 }
 
 void loop()
 {
-}
-
-/**
- * @brief Enable sleepmode cycle
- * 
- * @param minutes Input sleep cycle in minutes.
- */
-void go_to_sleep(int minutes)
-{
-  ESP.deepSleep(1000000 * 60 * minutes);
-}
-
-/**
- * @brief Enable Watch Dog Timer so ESP32 restarts.
- * 
- * @param minutes Input timer in minutes.
- */
-void enableWDT(int minutes)
-{
-  esp_task_wdt_init(60 * minutes, true);
-  esp_task_wdt_add(NULL); // Add current thread to WDT watch.
-}
-
-/**
- * @brief Disable Watch Dog Timer.
- * 
- */
-void disableWDT()
-{
-  esp_task_wdt_deinit();
 }

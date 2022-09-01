@@ -40,7 +40,6 @@ int decimals=3;
 // SHT31 sensor imput parameter attributes
 String sensornameSht[] = {"Temperature", "Humidity"};
 String unitSht[] = {"°C", "%"};
-int numberOfSamplesSht = 10;
 long sampleRead_delaySht = 50;
 
 //PMS5003 sensor imput parameter attributes
@@ -51,7 +50,7 @@ String sensornameSps30[] = {"PM 1.0(SPS 1)", "PM 2.5(SPS 1)", "PM 10.0(SPS 1)"};
 
 // Creating sensor objects
 voltageSensor voltageSensors(numberOfSensors, pinNumber, sensorname, voltageSenseFactor, min_, max_, unit, numberOfSamples, sampleRead_delay, decimals);
-SHT31_S sht31(enablepin, sensornameSht, unitSht, numberOfSamplesSht, sampleRead_delaySht, decimals);
+SHT31_S sht31(enablepin, sensornameSht, unitSht, numberOfSamples,sampleRead_delaySht, decimals);
 PMS_SS pms1;
 PMS_SSS pms2;
 //SPS30_SS sps30(enablepin, sensornameSps30, unitPM); //(Open for future implementation)
@@ -75,10 +74,10 @@ void setup()
   sht31.begin();
   pms1.begin(33, 32, enablepin, sensornamePM1, unitPM, numberOfSamples, sampleRead_delay);
   pms2.begin(35, 34, enablepin, sensornamePM2, unitPM, numberOfSamples, sampleRead_delay);
-  // sps30.begin(&Wire); (Open for future implementation)
+  // sps30.begin(&Wire);
 
   // Pass the sensor, communication and logger objects to the sequencer
-  myscience.processSensors( sht31, pms1, pms2, voltageSensors); // must go at last
+  myscience.processSensors(sht31, pms1, pms2, voltageSensors); // must go at last
   myscience.postData(mysim);
   myscience.log(mylogger);
 
@@ -93,6 +92,7 @@ void loop()
 {
 }
 
+
 /**
  * @brief Enable sleepmode cycle
  * 
@@ -102,6 +102,7 @@ void go_to_sleep(int minutes)
 {
   ESP.deepSleep(1000000 * 60 * minutes);
 }
+
 
 /**
  * @brief Enable Watch Dog Timer so ESP32 restarts.

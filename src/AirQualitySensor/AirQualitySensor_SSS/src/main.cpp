@@ -45,9 +45,26 @@ SPS30_SS sps30(enablepin, sensornameSps30, unitPM);
 PMS_SS pms1;
 PMS_SSS pms2;
 
-void go_to_sleep(){
-ESP.deepSleep(1000000*60*60);
+
+// Enable sleepmode cycle
+void go_to_sleep(int minutes = 60) // Default time set to 60 minutes.
+{
+  ESP.deepSleep(1000000 * 60 * minutes);
 }
+
+// Enable panic so ESP32 restarts
+void enableWDT(int minutes = 10)
+{
+  esp_task_wdt_init(60 * minutes, true);
+  esp_task_wdt_add(NULL); // Add current thread to WDT watch.
+}
+
+
+void disableWDT()
+{
+  esp_task_wdt_deinit();
+}
+
 void setup() {
   // put your setup code here, to run once:
   Wire.begin();
@@ -63,7 +80,7 @@ void setup() {
   pms1.begin(33, 32, enablepin,sensornamePM1,unitPM,numberOfSamples, sampleRead_delay);
   pms2.begin(35, 34, enablepin,sensornamePM2,unitPM,numberOfSamples, sampleRead_delay,0,1);
   //sps30.begin(&Wire);
-  myscience.processSensors(sht31 ,pms1, pms2); //must go at last
+  myscience.processSensors(sht31 ,pms1, pms2, voltageSensors); //must go at last
   myscience.postData(mysim);
   myscience.log(mylogger);
 

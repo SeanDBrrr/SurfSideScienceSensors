@@ -4,22 +4,21 @@
 #include <Arduino.h>
 #include "PMS.h"
 #include "SoftwareSerial.h"
-SoftwareSerial serial;
-
-enum Particulates
-{
-    PM1_0,
-    PM2_5,
-    PM10_0
-};
 
 class PMS_SS : public sensorBase
 {
 public:
+    SoftwareSerial serial;
+
+    enum Particulates
+    {
+        PM1_0,
+        PM2_5,
+        PM10_0
+    };
     PMS *pms;
     PMS::DATA pms_data;
-    int index_;
-    void begin(int rxPin, int txPin, int enablepin, String sensorname[], String unit[], int numberOfSamples = 10, long sampleRead_delay = 50, int decimals = 0, int index = 0)
+    void begin(int rxPin, int txPin, int enablepin, String sensorname[], String unit[], int numberOfSamples = 10, long sampleRead_delay = 50, int decimals = 0)
     {
         ENABLEPIN = enablepin;
         averagingSamples = numberOfSamples;
@@ -28,10 +27,9 @@ public:
         SENSOR_ENABLE_STATE = HIGH;
         sensorPwrDelay = 500;
         numberOfreadings = 3;
-        index_ = index;
         serial.begin(9600, SWSERIAL_8N1, rxPin, txPin, false, 192);
         PMS pms_(serial);
-           pms = &pms_;
+        pms = &pms_;
         for (int i = 0; i < numberOfreadings; i++)
         {
             sensorName[i] = sensorname[i];
